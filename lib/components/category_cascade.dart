@@ -9,26 +9,42 @@ class CategoryCascade extends StatefulWidget {
   _CategoryCascadeState createState() => _CategoryCascadeState();
 }
 
-List<Category> list = fetchList();
+List<Category> list;
 
 class _CategoryCascadeState extends State<CategoryCascade> {
   @override
   Widget build(BuildContext context) {
+    getCategories();
     return Container(
-      child: Cascade(args: list),
+      child: Text('ddd'),
     );
+  }
+}
+
+Future<void> getCategories() async {
+  try {
+    List<Category> list = await fetchList();
+    print(json.encode(list));
+  } catch (e) {
+    print(e);
   }
 }
 
 Future<List<Category>> fetchList() async {
   final resp =
-      await http.get('http://47.112.23.45:5001/1.0/article/getAllCategories');
+      await http.post('http://47.112.23.45:5001/1.0/article/getAllCategories');
   if (resp.statusCode == 200) {
     print(resp);
-    return Category.fromJson(json.decode(resp.body));
+    return parseCategories(resp.body);
   } else {
     throw Exception('Faild to load list');
   }
+}
+
+List<Category> parseCategories(String responseBody) {
+  final parsed = json.decode(responseBody);
+  final parsedData = parsed['data'].cast<Map<String, dynamic>>();
+  return parsedData.map<Category>((json) => Category.fromJson(json)).toList();
 }
 
 class Category {
@@ -46,5 +62,10 @@ class Category {
       level: json['level'],
       name: json['name'],
     );
+  }
+
+  @override
+  String toString() {
+    return name;
   }
 }
