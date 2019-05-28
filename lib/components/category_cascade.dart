@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'cascade.dart';
@@ -9,63 +10,81 @@ class CategoryCascade extends StatefulWidget {
   _CategoryCascadeState createState() => _CategoryCascadeState();
 }
 
-List<Category> list;
-
 class _CategoryCascadeState extends State<CategoryCascade> {
   @override
   Widget build(BuildContext context) {
-    getCategories();
     return Container(
-      child: Text('ddd'),
+      child: FutureBuilder<List<Category>>(
+        future: fetchList(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.hasError) print(snapshot.error);
+//          print(snapshot);
+          return snapshot.hasData
+              ? Cascade(
+                  args: snapshot.data,
+                )
+              : Text('Pengding...');
+        },
+      ),
     );
   }
 }
 
-Future<void> getCategories() async {
-  try {
-    List<Category> list = await fetchList();
-    print(json.encode(list));
-  } catch (e) {
-    print(e);
-  }
-}
-
 Future<List<Category>> fetchList() async {
-  final resp =
-      await http.post('http://47.112.23.45:5001/1.0/article/getAllCategories');
+  final resp = await http
+      .post('http://russellwq.club:5001/1.0/article/getAllCategories');
   if (resp.statusCode == 200) {
-    print(resp);
-    return parseCategories(resp.body);
+    var computed = compute(parseCategories, resp.body);
+    return computed;
   } else {
-    throw Exception('Faild to load list');
+    throw Exception('请求类目失败！');
   }
 }
 
 List<Category> parseCategories(String responseBody) {
   final parsed = json.decode(responseBody);
   final parsedData = parsed['data'].cast<Map<String, dynamic>>();
-  return parsedData.map<Category>((json) => Category.fromJson(json)).toList();
+  final listData = parsedData.map<Category>((json) => Category.fromJson(json)).toList();
+  return listData;
 }
 
 class Category {
-  final int fatherId;
-  final int id;
-  final int level;
-  final String name;
+  int fatherId;
+  int id;
+  int level;
+  String name;
+  List<Category> subCategory;
 
-  Category({this.fatherId, this.id, this.level, this.name});
+  Category({this.fatherId, this.id, this.level, this.name, this.subCategory});
 
-  factory Category.fromJson(Map<String, dynamic> json) {
-    return Category(
-      fatherId: json['father_id'],
-      id: json['id'],
-      level: json['level'],
-      name: json['name'],
-    );
+  Category.fromJson(Map<String, dynamic> json) {
+    fatherId = json['father_id'];
+    id = json['id'];
+    level = json['level'];
+    name = json['name'];
+    if (json['subCategory'] != null) {
+      subCategory = List<Category>();
+      json['subCategory'].forEach((v) {
+        subCategory.add(Category.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['father_id'] = this.fatherId;
+    data['id'] = this.id;
+    data['level'] = this.level;
+    data['name'] = this.name;
+    if (this.subCategory != null) {
+      data['subCategory'] = this.subCategory.map((v) => v.toJson()).toList();
+    }
+    return data;
   }
 
   @override
   String toString() {
-    return name;
+    return 'fatherId: $fatherId, id: $id, level: $level, name: $name, category: $subCategory';
   }
 }
+
