@@ -4,35 +4,60 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'cascade.dart';
+import 'package:russell_flutter/components/common/cascade.dart';
 
 class CategoryCascade extends StatefulWidget {
   _CategoryCascadeState createState() => _CategoryCascadeState();
 }
 
 class _CategoryCascadeState extends State<CategoryCascade> {
+  bool _active = false;
+
+  onSelected(value) {
+    setState(() {
+      _active = false;
+    });
+    print(value);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: FutureBuilder<List<Category>>(
-        future: fetchList(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.hasError) print(snapshot.error);
-//          print(snapshot);
-          return snapshot.hasData
-              ? Cascade(
-                  args: snapshot.data,
-                )
-              : Text('Pengding...');
-        },
-      ),
+    return Column(
+      children: <Widget>[
+        _active
+            ? Container(
+                width: 200,
+                height: 200,
+                child: FutureBuilder<List<Category>>(
+                  future: fetchList(http.Client()),
+                  builder: (BuildContext context, AsyncSnapshot snapshot) {
+                    if (snapshot.hasError) print(snapshot.error);
+                    return snapshot.hasData
+                        ? Cascade(
+                            args: snapshot.data,
+                            onSelected: (value) => onSelected(value))
+                        : Text('Pengding...');
+                  },
+                ),
+              )
+            : Container(
+                child: RaisedButton(
+                  onPressed: () {
+                    setState(() {
+                      _active = !_active;
+                    });
+                  },
+                  child: Text('show'),
+                ),
+              ),
+      ],
     );
   }
 }
 
-Future<List<Category>> fetchList() async {
-  final resp = await http
-      .post('http://russellwq.club:5001/1.0/article/getAllCategories');
+Future<List<Category>> fetchList(http.Client client) async {
+  final resp = await client
+      .post('http://russellwq.club:8081/1.0/article/getAllCategories');
   if (resp.statusCode == 200) {
     var computed = compute(parseCategories, resp.body);
     return computed;
@@ -44,7 +69,8 @@ Future<List<Category>> fetchList() async {
 List<Category> parseCategories(String responseBody) {
   final parsed = json.decode(responseBody);
   final parsedData = parsed['data'].cast<Map<String, dynamic>>();
-  final listData = parsedData.map<Category>((json) => Category.fromJson(json)).toList();
+  final listData =
+      parsedData.map<Category>((json) => Category.fromJson(json)).toList();
   return listData;
 }
 
@@ -87,4 +113,3 @@ class Category {
     return 'fatherId: $fatherId, id: $id, level: $level, name: $name, category: $subCategory';
   }
 }
-
