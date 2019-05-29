@@ -12,12 +12,20 @@ class CategoryCascade extends StatefulWidget {
 
 class _CategoryCascadeState extends State<CategoryCascade> {
   bool _active = false;
+  Level showLevel = Level.level1;
+  List<int> selectedValue = [];
 
   onSelected(value) {
+    if (selectedValue.length == 0 ||
+        value.id == selectedValue[selectedValue.length - 1]) {
+      selectedValue.add(value.id);
+    }
+
     setState(() {
       _active = false;
+      selectedValue = selectedValue;
     });
-    print(value);
+    print(selectedValue);
   }
 
   @override
@@ -113,3 +121,5 @@ class Category {
     return 'fatherId: $fatherId, id: $id, level: $level, name: $name, category: $subCategory';
   }
 }
+
+enum Level { level1, level2, level3 }

@@ -10,34 +10,49 @@ class Cascade extends StatefulWidget {
 
   Cascade({Key key, this.args, this.onSelected}) : super(key: key);
 
-  _CascadeState createState() => _CascadeState(args: args, onSelected: onSelected);
+  _CascadeState createState() =>
+      _CascadeState(args: args, onSelected: onSelected);
 }
 
 class _CascadeState extends State<Cascade> {
   final List<dynamic> args;
+  List<Widget> listView = <Widget>[];
   final onSelected;
 
   _CascadeState({this.args, this.onSelected});
 
   @override
+  void initState() {
+    super.initState();
+    initView(this.args);
+  }
+
+  void initView(listData) {
+    var newList = <Widget>[];
+    for (var item in listData) {
+      Widget tempWidget = GestureDetector(
+        child: Container(
+          child: Text(item?.name),
+          color: Colors.white30,
+          height: 30,
+        ),
+        onTap: () {
+          widget.onSelected(item);
+        },
+      );
+      newList.add(tempWidget);
+
+      setState(() {
+        listView = newList;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-        child: ListView.builder(
-      itemCount: this.args.length,
-      itemBuilder: (BuildContext context, int index) {
-        return GestureDetector(
-          onTap: () {
-            widget.onSelected(this.args[index]);
-          },
-          child: Container(
-            height: 30,
-            color: Colors.white,
-            child: Center(
-              child: Text(this.args != null ? this.args[index]?.name : ''),
-            ),
-          ),
-        );
-      },
+        child: Column(
+      children: listView,
     ));
   }
 }
