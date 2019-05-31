@@ -15,44 +15,56 @@ class Cascade extends StatefulWidget {
 }
 
 class _CascadeState extends State<Cascade> {
-  final List<dynamic> args;
-  List<Widget> listView = <Widget>[];
-  final onSelected;
+  List<dynamic> args;
+  Row cascadeView;
+  Function onSelected;
 
   _CascadeState({this.args, this.onSelected});
 
-  @override
-  void initState() {
-    super.initState();
-    initView(this.args);
-  }
-
   void initView(listData) {
-    var newList = <Widget>[];
-    for (var item in listData) {
-      Widget tempWidget = GestureDetector(
-        child: Container(
-          child: Text(item?.name),
-          color: Colors.white30,
-          height: 30,
-        ),
-        onTap: () {
-          widget.onSelected(item);
-        },
-      );
-      newList.add(tempWidget);
+    Row rowView;
+    List<Widget> allWidgetsTemp = <Widget>[];
 
-      setState(() {
-        listView = newList;
-      });
+    /// 循环组织每一列
+    for (var i = 0; i < listData.length; i++) {
+      Container columnContainer;
+      List<Widget> widgetsTemp = <Widget>[];
+
+      /// 循环组织每一列中的每一行
+      for (var j = 0, o = listData[i]; j < o.length; j++) {
+        Widget tempWidget = GestureDetector(
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+            child: Text(o[j]?.name),
+          ),
+          onTap: () {
+            widget.onSelected(j, i, o[j]);
+          },
+        );
+
+        widgetsTemp.add(tempWidget);
+        columnContainer = Container(
+          color: Colors.deepOrangeAccent,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: widgetsTemp,
+          ),
+        );
+      }
+
+      allWidgetsTemp.add(columnContainer);
+      rowView = Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: allWidgetsTemp,
+      );
     }
+    this.cascadeView = rowView;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        child: Column(
-      children: listView,
-    ));
+    initView(this.args);
+
+    return Container(child: this.cascadeView);
   }
 }

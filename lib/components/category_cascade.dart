@@ -1,29 +1,63 @@
 import 'dart:async';
-import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:russell_flutter/components/common/cascade.dart';
+import 'package:russell_flutter/services/category.dart' as service;
 
 class CategoryCascade extends StatefulWidget {
   _CategoryCascadeState createState() => _CategoryCascadeState();
 }
 
 class _CategoryCascadeState extends State<CategoryCascade> {
+  List<service.Category> unhandledData;
+  List<List<service.Category>> options;
+
   bool _active = false;
-  Level showLevel = Level.level1;
   List<int> selectedValue = [];
 
-  onSelected(value) {
-    if (selectedValue.length == 0 ||
-        value.id == selectedValue[selectedValue.length - 1]) {
-      selectedValue.add(value.id);
-    }
+  @override
+  void initState() {
+    super.initState();
+    initData();
+  }
+
+  /// 初始化组件选择数据
+  Future initData() async {
+    var respData = await service.fetchList();
 
     setState(() {
-      _active = false;
+      unhandledData = respData;
+      options = [respData];
+    });
+  }
+
+  /// 当Cascade组件点击选择项事记录选项并展示下一级数据提供选择
+  /// [level]表示当前选中的是第几列
+  /// [value]表示当前选中的数据
+  onSelected(int index, int level, service.Category value) {
+    var allOptions = options;
+
+    if (value.subCategory == null || value.subCategory.length == 0) {
+      /// 写入尾部数据
+      selectedValue.add(value.id);
+    } else if (selectedValue.length == level) {
+      /// 选择层级
+      selectedValue.add(value.id);
+      allOptions.add(value.subCategory);
+    } else if (selectedValue.length > level &&
+        value.id != selectedValue[level]) {
+      /// 重新选择已选层级
+      allOptions.removeRange(level + 1, allOptions.length);
+      selectedValue.removeRange(level, selectedValue.length);
+
+      selectedValue.add(value.id);
+      allOptions.add(value.subCategory);
+    } else {}
+
+    setState(() {
+      _active = selectedValue.length != options.length;
       selectedValue = selectedValue;
+      options = allOptions;
     });
     print(selectedValue);
   }
@@ -34,19 +68,12 @@ class _CategoryCascadeState extends State<CategoryCascade> {
       children: <Widget>[
         _active
             ? Container(
-                width: 200,
-                height: 200,
-                child: FutureBuilder<List<Category>>(
-                  future: fetchList(http.Client()),
-                  builder: (BuildContext context, AsyncSnapshot snapshot) {
-                    if (snapshot.hasError) print(snapshot.error);
-                    return snapshot.hasData
-                        ? Cascade(
-                            args: snapshot.data,
-                            onSelected: (value) => onSelected(value))
-                        : Text('Pengding...');
-                  },
-                ),
+                child: options != null
+                    ? Cascade(
+                        args: options,
+                        onSelected: (index, level, value) =>
+                            onSelected(index, level, value))
+                    : Text('Pengding...'),
               )
             : Container(
                 child: RaisedButton(
@@ -62,64 +89,3 @@ class _CategoryCascadeState extends State<CategoryCascade> {
     );
   }
 }
-
-Future<List<Category>> fetchList(http.Client client) async {
-  final resp = await client
-      .post('http://russellwq.club:8081/1.0/article/getAllCategories');
-  if (resp.statusCode == 200) {
-    var computed = compute(parseCategories, resp.body);
-    return computed;
-  } else {
-    throw Exception('请求类目失败！');
-  }
-}
-
-List<Category> parseCategories(String responseBody) {
-  final parsed = json.decode(responseBody);
-  final parsedData = parsed['data'].cast<Map<String, dynamic>>();
-  final listData =
-      parsedData.map<Category>((json) => Category.fromJson(json)).toList();
-  return listData;
-}
-
-class Category {
-  int fatherId;
-  int id;
-  int level;
-  String name;
-  List<Category> subCategory;
-
-  Category({this.fatherId, this.id, this.level, this.name, this.subCategory});
-
-  Category.fromJson(Map<String, dynamic> json) {
-    fatherId = json['father_id'];
-    id = json['id'];
-    level = json['level'];
-    name = json['name'];
-    if (json['subCategory'] != null) {
-      subCategory = List<Category>();
-      json['subCategory'].forEach((v) {
-        subCategory.add(Category.fromJson(v));
-      });
-    }
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['father_id'] = this.fatherId;
-    data['id'] = this.id;
-    data['level'] = this.level;
-    data['name'] = this.name;
-    if (this.subCategory != null) {
-      data['subCategory'] = this.subCategory.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
-
-  @override
-  String toString() {
-    return 'fatherId: $fatherId, id: $id, level: $level, name: $name, category: $subCategory';
-  }
-}
-
-enum Level { level1, level2, level3 }
