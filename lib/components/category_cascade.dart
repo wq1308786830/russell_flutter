@@ -1,71 +1,104 @@
 import 'dart:async';
-import 'dart:convert';
 
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'cascade.dart';
+import 'package:russell_flutter/components/common/cascade.dart';
+import 'package:russell_flutter/models/category.dart';
+import 'package:russell_flutter/services/category.dart' as service;
 
 class CategoryCascade extends StatefulWidget {
-  _CategoryCascadeState createState() => _CategoryCascadeState();
-}
+  final Function onCategoryChange;
 
-List<Category> list;
+  CategoryCascade({this.onCategoryChange});
+
+  _CategoryCascadeState createState() => _CategoryCascadeState(onCategoryChange: onCategoryChange);
+}
 
 class _CategoryCascadeState extends State<CategoryCascade> {
+  List<Category> unhandledData;
+  List<List<Category>> options;
+
+  Function onCategoryChange;
+
+  bool _active = false;
+  List<int> selectedValue = [];
+
+  _CategoryCascadeState({this.onCategoryChange});
+
+  @override
+  void initState() {
+    super.initState();
+    initData();
+  }
+
+  /// 初始化组件选择数据
+  Future initData() async {
+    var respData = await service.fetchList();
+
+    setState(() {
+      unhandledData = respData;
+      options = [respData];
+    });
+  }
+
+  /// 当Cascade组件点击选择项事记录选项并展示下一级数据提供选择
+  /// [level]表示当前选中的是第几列
+  /// [value]表示当前选中的数据
+  onSelected(int index, int level, Category value) {
+    var allOptions = options;
+
+    if (value.subCategory == null || value.subCategory.length == 0) {
+      /// 写入尾部数据
+      selectedValue.removeRange(level, selectedValue.length);
+      selectedValue.add(value.id);
+
+      /// 传递到父组件
+      widget.onCategoryChange(selectedValue);
+    } else if (selectedValue.length == level &&
+        (value.subCategory != null && value.subCategory.length != 0)) {
+      /// 选择层级
+      selectedValue.add(value.id);
+      allOptions.add(value.subCategory);
+    } else if (selectedValue.length > level &&
+        (value.subCategory != null && value.subCategory.length != 0)) {
+      /// 重新选择已选层级
+      allOptions.removeRange(level + 1, allOptions.length);
+      selectedValue.removeRange(level, selectedValue.length);
+
+      selectedValue.add(value.id);
+      allOptions.add(value.subCategory);
+    }
+
+    setState(() {
+      _active = selectedValue.length != options.length;
+      selectedValue = selectedValue;
+      options = allOptions;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    getCategories();
-    return Container(
-      child: Text('ddd'),
+    return Column(
+      children: <Widget>[
+        _active
+            ? Container(
+                child: options != null
+                    ? Cascade(
+                        args: options,
+                        onSelected: (index, level, value) =>
+                            onSelected(index, level, value))
+                    : Text('Pengding...'),
+              )
+            : Container(
+                child: RaisedButton(
+                  onPressed: () {
+                    setState(() {
+                      _active = !_active;
+                    });
+                  },
+                  child: Text('show'),
+                ),
+              ),
+      ],
     );
-  }
-}
-
-Future<void> getCategories() async {
-  try {
-    List<Category> list = await fetchList();
-    print(json.encode(list));
-  } catch (e) {
-    print(e);
-  }
-}
-
-Future<List<Category>> fetchList() async {
-  final resp =
-      await http.post('http://47.112.23.45:5001/1.0/article/getAllCategories');
-  if (resp.statusCode == 200) {
-    print(resp);
-    return parseCategories(resp.body);
-  } else {
-    throw Exception('Faild to load list');
-  }
-}
-
-List<Category> parseCategories(String responseBody) {
-  final parsed = json.decode(responseBody);
-  final parsedData = parsed['data'].cast<Map<String, dynamic>>();
-  return parsedData.map<Category>((json) => Category.fromJson(json)).toList();
-}
-
-class Category {
-  final int fatherId;
-  final int id;
-  final int level;
-  final String name;
-
-  Category({this.fatherId, this.id, this.level, this.name});
-
-  factory Category.fromJson(Map<String, dynamic> json) {
-    return Category(
-      fatherId: json['father_id'],
-      id: json['id'],
-      level: json['level'],
-      name: json['name'],
-    );
-  }
-
-  @override
-  String toString() {
-    return name;
   }
 }
