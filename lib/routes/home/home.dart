@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:russell_flutter/blocs/article_bloc.dart';
+import 'package:russell_flutter/blocs/blocs.dart';
 import 'package:russell_flutter/components/category_cascade.dart';
+import 'package:russell_flutter/routes/articles/article_list.dart';
 
 class Home extends StatelessWidget {
 
@@ -21,7 +26,11 @@ class Home extends StatelessWidget {
               CategoryCascade(onCategoryChange: this.onCategoryChange),
               Text('body'),
               Flexible(
-                child: _buildList(),
+                child: BlocProvider(
+                  builder: (context) =>
+                  ArticleBloc(httpClient: http.Client())..dispatch(Fetch()),
+                  child: ArticleList(),
+                ),
               )
             ],
           )
