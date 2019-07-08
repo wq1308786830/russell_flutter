@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:russell_flutter/blocs/article_bloc.dart';
+import 'package:russell_flutter/blocs/article/article_bloc.dart';
 import 'package:russell_flutter/blocs/blocs.dart';
 import 'package:russell_flutter/components/category_cascade.dart';
 import 'package:russell_flutter/routes/articles/article_list.dart';
@@ -16,6 +16,17 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        drawer: Drawer(
+          child: ListTile(
+            contentPadding: EdgeInsetsDirectional.only(top: 80),
+            leading: Icon(Icons.change_history),
+            title: Text('Change history'),
+            onTap: () {
+              // change app state...
+              Navigator.pop(context); // close the drawer
+            },
+          ),
+        ),
         appBar: AppBar(
           title: Text('Home'),
         ),
@@ -28,7 +39,7 @@ class Home extends StatelessWidget {
               Flexible(
                 child: BlocProvider(
                   builder: (context) =>
-                  ArticleBloc(httpClient: http.Client())..dispatch(Fetch()),
+                  ArticleBloc(httpClient: http.Client())..dispatch(FetchArticle()),
                   child: ArticleList(),
                 ),
               )

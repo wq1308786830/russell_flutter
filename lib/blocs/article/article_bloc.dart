@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 import 'package:russell_flutter/models/article_shortend.dart';
 import 'package:rxdart/rxdart.dart';
-import 'blocs.dart';
+import 'package:russell_flutter/blocs/blocs.dart';
 
 class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
   final http.Client httpClient;
@@ -13,12 +13,11 @@ class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
   ArticleBloc({@required this.httpClient});
 
   @override
-  // TODO: implement initialState
   ArticleState get initialState => ArticleUninitialized();
 
   @override
   Stream<ArticleState> mapEventToState(ArticleEvent event) async* {
-    if (event is Fetch && !_hasReachedMax(currentState)) {
+    if (event is FetchArticle && !_hasReachedMax(currentState)) {
       try {
         if (currentState is ArticleUninitialized) {
           final articles = await _fetchArticles(0, 20);

@@ -7,7 +7,7 @@ abstract class ArticleState extends Equatable {
 
 class ArticleUninitialized extends ArticleState {
   @override
-  String toString() => 'PostUninitialized';
+  String toString() => 'Article Uninitialized';
 }
 
 class ArticleError extends ArticleState {

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:russell_flutter/blocs/article_bloc.dart';
+import 'package:russell_flutter/blocs/article/article_bloc.dart';
 import 'package:russell_flutter/blocs/blocs.dart';
-import 'package:russell_flutter/components/common/BottomLoader.dart';
-import 'package:russell_flutter/routes/articles/ArticleWidget.dart';
+import 'package:russell_flutter/components/common/bottom_loader.dart';
+import 'package:russell_flutter/routes/articles/article_widget.dart';
 
 class ArticleList extends StatefulWidget {
   @override
@@ -64,7 +64,7 @@ class _ArticleListState extends State<ArticleList> {
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.position.pixels;
     if (maxScroll - currentScroll <= _scrollThreshold) {
-      _articleBloc.dispatch(Fetch());
+      _articleBloc.dispatch(FetchArticle());
     }
   }
 }
