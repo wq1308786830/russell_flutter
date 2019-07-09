@@ -24,6 +24,7 @@ class _ArticleListState extends State<ArticleList> {
 
   @override
   Widget build(BuildContext context) {
+    _articleBloc = BlocProvider.of<ArticleBloc>(context);
     return BlocBuilder(
       bloc: _articleBloc,
       builder: (BuildContext context, ArticleState state) {

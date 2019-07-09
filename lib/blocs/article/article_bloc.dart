@@ -8,9 +8,11 @@ import 'package:rxdart/rxdart.dart';
 import 'package:russell_flutter/blocs/blocs.dart';
 
 class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
-  final http.Client httpClient;
+  http.Client httpClient;
 
-  ArticleBloc({@required this.httpClient});
+  ArticleBloc() {
+    this.httpClient = http.Client();
+  }
 
   @override
   ArticleState get initialState => ArticleUninitialized();
@@ -27,6 +29,26 @@ class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
         if (currentState is ArticleLoaded) {
           final articles = await _fetchArticles(
               (currentState as ArticleLoaded).articles.length, 20);
+          yield articles.isEmpty
+              ? (currentState as ArticleLoaded).copyWith(hasReachedMax: true)
+              : ArticleLoaded(
+                  articles: (currentState as ArticleLoaded).articles + articles,
+                  hasReachedMax: false);
+        }
+      } catch (_) {
+        yield ArticleError();
+      }
+    } else if (event is FetchClassifiedArticle &&
+        !_hasReachedMax(currentState)) {
+      try {
+        if (currentState is ArticleUninitialized) {
+          final articles = await _fetchArticles(20, 10);
+          yield ArticleLoaded(articles: articles, hasReachedMax: false);
+          return;
+        }
+        if (currentState is ArticleLoaded) {
+          final articles = await _fetchArticles(
+              (currentState as ArticleLoaded).articles.length, 10);
           yield articles.isEmpty
               ? (currentState as ArticleLoaded).copyWith(hasReachedMax: true)
               : ArticleLoaded(
