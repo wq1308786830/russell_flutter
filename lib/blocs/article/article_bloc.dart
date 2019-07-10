@@ -9,9 +9,12 @@ import 'package:russell_flutter/blocs/blocs.dart';
 
 class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
   http.Client httpClient;
+  int startIndex, limit;
 
   ArticleBloc() {
     this.httpClient = http.Client();
+    this.limit = 20;
+    this.startIndex = 0;
   }
 
   @override
@@ -22,13 +25,13 @@ class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
     if (event is FetchArticle && !_hasReachedMax(currentState)) {
       try {
         if (currentState is ArticleUninitialized) {
-          final articles = await _fetchArticles(0, 20);
+          final articles = await _fetchArticles(this.startIndex, this.limit);
           yield ArticleLoaded(articles: articles, hasReachedMax: false);
           return;
         }
         if (currentState is ArticleLoaded) {
           final articles = await _fetchArticles(
-              (currentState as ArticleLoaded).articles.length, 20);
+              (currentState as ArticleLoaded).articles.length + this.startIndex, this.limit);
           yield articles.isEmpty
               ? (currentState as ArticleLoaded).copyWith(hasReachedMax: true)
               : ArticleLoaded(
@@ -41,19 +44,15 @@ class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
     } else if (event is FetchClassifiedArticle &&
         !_hasReachedMax(currentState)) {
       try {
+        if (currentState is ArticleLoaded) {
+          yield ArticleUninitialized();
+        }
         if (currentState is ArticleUninitialized) {
-          final articles = await _fetchArticles(20, 10);
+          this.startIndex = 20;
+          this.limit = 10;
+          final articles = await _fetchArticles(this.startIndex, this.limit);
           yield ArticleLoaded(articles: articles, hasReachedMax: false);
           return;
-        }
-        if (currentState is ArticleLoaded) {
-          final articles = await _fetchArticles(
-              (currentState as ArticleLoaded).articles.length, 10);
-          yield articles.isEmpty
-              ? (currentState as ArticleLoaded).copyWith(hasReachedMax: true)
-              : ArticleLoaded(
-                  articles: (currentState as ArticleLoaded).articles + articles,
-                  hasReachedMax: false);
         }
       } catch (_) {
         yield ArticleError();

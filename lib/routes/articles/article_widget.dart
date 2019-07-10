@@ -27,15 +27,15 @@ class ArticleWidget extends StatelessWidget {
             borderRadius: BorderRadius.all(const Radius.circular(20)),
           ),
           child: Text(
-            '${article.id}',
+            '${this.article.id}',
             style: TextStyle(
               fontSize: 16.0,
               color: textColor
             ),
           )),
-      title: Text(article.title),
+      title: Text(this.article.title),
       isThreeLine: true,
-      subtitle: Text(article.description),
+      subtitle: Text(this.article.description),
       dense: true,
     );
   }

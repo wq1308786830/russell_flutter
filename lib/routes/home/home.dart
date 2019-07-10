@@ -16,6 +16,7 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     final ArticleBloc _articleBloc = BlocProvider.of<ArticleBloc>(context);
     final CategoryBloc _categoryBloc = BlocProvider.of<CategoryBloc>(context);
+    _articleBloc.dispatch(FetchArticle());
     _categoryBloc.dispatch(FetchCategory());
     return Scaffold(
         drawer: Drawer(
@@ -33,7 +34,7 @@ class Home extends StatelessWidget {
             CategoryCascade(onCategoryChange: this.onCategoryChange),
             Flexible(
               child: BlocProvider(
-                builder: (context) => _articleBloc..dispatch(FetchArticle()),
+                builder: (context) => _articleBloc,
                 child: ArticleList(),
               ),
             )

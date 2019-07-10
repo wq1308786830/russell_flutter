@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
+import 'package:meta/meta.dart';
 
+@immutable
 class ArticleShortened extends Equatable {
   final int id;
   final String title;
@@ -20,7 +22,18 @@ class ArticleShortened extends Equatable {
       this.isRecommend,
       this.datePublish,
       this.categoryId,
-      this.userId});
+      this.userId})
+      : super([
+          id,
+          title,
+          description,
+          avatar,
+          clickCount,
+          isRecommend,
+          datePublish,
+          categoryId,
+          userId
+        ]);
 
   @override
   String toString() => 'ArticleShortened { id: $id }';

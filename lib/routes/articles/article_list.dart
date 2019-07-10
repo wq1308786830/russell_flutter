@@ -18,14 +18,14 @@ class _ArticleListState extends State<ArticleList> {
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_onScroll);
-    _articleBloc = BlocProvider.of<ArticleBloc>(context);
+    this._scrollController.addListener(_onScroll);
+    this._articleBloc = BlocProvider.of<ArticleBloc>(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder(
-      bloc: _articleBloc,
+      bloc: this._articleBloc,
       builder: (BuildContext context, ArticleState state) {
         if (state is ArticleError) {
           return Center(child: Text('failed to fetch articles'));
@@ -48,7 +48,7 @@ class _ArticleListState extends State<ArticleList> {
               itemCount: state.hasReachedMax
                   ? state.articles.length
                   : state.articles.length + 1,
-              controller: _scrollController);
+              controller: this._scrollController);
         }
       },
     );
@@ -56,15 +56,15 @@ class _ArticleListState extends State<ArticleList> {
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    this._scrollController.dispose();
     super.dispose();
   }
 
   void _onScroll() {
-    final maxScroll = _scrollController.position.maxScrollExtent;
-    final currentScroll = _scrollController.position.pixels;
-    if (maxScroll - currentScroll <= _scrollThreshold) {
-      _articleBloc.dispatch(FetchArticle());
+    final maxScroll = this._scrollController.position.maxScrollExtent;
+    final currentScroll = this._scrollController.position.pixels;
+    if (maxScroll - currentScroll <= this._scrollThreshold) {
+      this._articleBloc.dispatch(FetchArticle());
     }
   }
 }

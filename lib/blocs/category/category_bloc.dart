@@ -10,8 +10,8 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
   http.Client httpClient;
 
   CategoryBloc() {
-    _articleBloc = ArticleBloc();
-    httpClient = http.Client();
+    this._articleBloc = ArticleBloc();
+    this.httpClient = http.Client();
   }
 
   @override
@@ -30,14 +30,14 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
         yield CategoryError();
       }
     } else if (event is CategoryPressed) {
-      _articleBloc
+      this._articleBloc
           .dispatch(FetchClassifiedArticle(categoryId: event.category.id));
     }
   }
 
   /// 获取类目数据
   Future<List<model.Category>> _fetchCategories() async {
-    final response = await httpClient
+    final response = await this.httpClient
         .post('http://russellwq.club:8081/1.0/article/getAllCategories');
 
     if (response.statusCode == 200) {
