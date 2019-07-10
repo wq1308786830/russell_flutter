@@ -8,19 +8,15 @@ import 'package:russell_flutter/routes/home/drawer_widget.dart';
 
 class Home extends StatelessWidget {
 
-  final CategoryBloc _categoryBloc = CategoryBloc();
-
-  Home() {
-    // 派发事件开始获取分类数据
-    _categoryBloc.dispatch(FetchCategory());
-  }
-
   void onCategoryChange(value) {
     print(value);
   }
 
   @override
   Widget build(BuildContext context) {
+    final ArticleBloc _articleBloc = BlocProvider.of<ArticleBloc>(context);
+    final CategoryBloc _categoryBloc = BlocProvider.of<CategoryBloc>(context);
+    _categoryBloc.dispatch(FetchCategory());
     return Scaffold(
         drawer: Drawer(
           child: BlocProvider(
@@ -37,7 +33,7 @@ class Home extends StatelessWidget {
             CategoryCascade(onCategoryChange: this.onCategoryChange),
             Flexible(
               child: BlocProvider(
-                builder: (context) => ArticleBloc()..dispatch(FetchArticle()),
+                builder: (context) => _articleBloc..dispatch(FetchArticle()),
                 child: ArticleList(),
               ),
             )

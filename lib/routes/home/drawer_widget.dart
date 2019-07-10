@@ -8,10 +8,6 @@ class DrawerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final CategoryBloc _bloc = BlocProvider.of<CategoryBloc>(context);
 
-    _onCategoryPressed(Category categoryItem) {
-      _bloc.dispatch(CategoryPressed(category: categoryItem));
-    }
-
     return BlocBuilder<CategoryEvent, CategoryState>(
       bloc: _bloc,
       builder: (BuildContext context, CategoryState state) {
@@ -35,7 +31,8 @@ class DrawerWidget extends StatelessWidget {
             itemBuilder: (BuildContext context, int index) {
               return ListTile(
                 onTap: () {
-                  _onCategoryPressed(state.categories[index]);
+                  Category category = state.categories[index];
+                  _bloc.dispatch(CategoryPressed(category: category));
                   Navigator.pop(context);
                 },
                 title: Text(state.categories[index].name)

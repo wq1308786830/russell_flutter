@@ -34,6 +34,6 @@ class ArticleLoaded extends ArticleState {
 
   @override
   String toString() {
-    return 'PostLoaded { posts: ${articles.length}, hasReachedMax: $hasReachedMax }';
+    return 'Article Loaded { posts: ${articles.length}, hasReachedMax: $hasReachedMax }';
   }
 }

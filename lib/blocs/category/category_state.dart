@@ -26,6 +26,6 @@ class CategoryLoaded extends CategoryState {
 
   @override
   String toString() {
-    return 'Category Loaded {ca}';
+    return 'Category Loaded { categories: ${categories.length} }';
   }
 }
