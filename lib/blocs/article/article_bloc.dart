@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:http/http.dart' as http;
-import 'package:meta/meta.dart';
 import 'package:russell_flutter/models/article_shortend.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:russell_flutter/blocs/blocs.dart';
@@ -56,6 +55,14 @@ class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
         }
       } catch (_) {
         yield ArticleError();
+      }
+    }
+
+    if (event is FetchArticleDetail) {
+      try {
+        if (currentState is ArticleDetailUninitialized) {
+
+        }
       }
     }
   }

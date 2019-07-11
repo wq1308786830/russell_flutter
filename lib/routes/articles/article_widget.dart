@@ -14,9 +14,13 @@ class ArticleWidget extends StatelessWidget {
     double colorH = ran.nextInt(360) * 1.0;
     double colorS = 1.0;
     double colorL = .5;
+    // 补色色相计算
     double oppositeH = colorH > 180 ? colorH - 180.0 : 360.0 + (colorH - 180.0);
+    // 背景色
     var backColor = HSLColor.fromAHSL(1, colorH, colorS, colorL).toColor();
+    // 背景上的文本色
     var textColor = HSLColor.fromAHSL(1, oppositeH, colorS, colorL).toColor();
+    
     return ListTile(
       leading: Container(
           width: 40,

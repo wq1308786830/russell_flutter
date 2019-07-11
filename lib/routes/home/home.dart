@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:russell_flutter/blocs/article/article_bloc.dart';
 import 'package:russell_flutter/blocs/blocs.dart';
 import 'package:russell_flutter/components/category_cascade.dart';
@@ -26,7 +27,14 @@ class Home extends StatelessWidget {
           ),
         ),
         appBar: AppBar(
-          title: Text('Russell'),
+          title: SvgPicture.network(
+            'https://v2.jinrishici.com/one.svg',
+            color: Colors.white,
+            placeholderBuilder: (BuildContext context) => Container(
+              padding: const EdgeInsets.all(30.0),
+              color: Colors.white,
+              child: const CircularProgressIndicator()),
+          ),
         ),
         body: Container(
             child: Column(

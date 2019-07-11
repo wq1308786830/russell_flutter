@@ -12,7 +12,7 @@ class ArticleUninitialized extends ArticleState {
 
 class ArticleError extends ArticleState {
   @override
-  String toString() => 'PostError';
+  String toString() => 'ArticleError';
 }
 
 class ArticleLoaded extends ArticleState {

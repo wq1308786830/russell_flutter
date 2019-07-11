@@ -18,5 +18,11 @@ class FetchClassifiedArticle extends ArticleEvent {
   FetchClassifiedArticle({@required this.categoryId}) : super([categoryId]);
 
   @override
-  String toString() => 'fetch classified article';
+  String toString() => 'FetchClassifiedArticle';
+}
+
+class FetchArticleDetail extends ArticleEvent {
+
+  @override
+  String toString() => 'FetchArticleDetail';
 }
