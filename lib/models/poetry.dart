@@ -14,13 +14,13 @@ class PoetryDetail {
 
 @immutable
 class Poetry extends Equatable {
-  final String id;
-  final String content;
-  final int popularity;
-  final PoetryDetail origin;
-  final List<String> matchTags;
-  final String recommendedReason;
-  final String cacheAt;
+  String id;
+  String content;
+  int popularity;
+  PoetryDetail origin;
+  List<String> matchTags;
+  String recommendedReason;
+  String cacheAt;
 
   Poetry(
       {this.id,
@@ -39,6 +39,21 @@ class Poetry extends Equatable {
           recommendedReason,
           cacheAt
         ]);
+
+  Poetry.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    content = json['content'];
+    popularity = json['popularity'];
+    matchTags = json['matchTags'];
+    recommendedReason = json['recommendedReason'];
+    cacheAt = json['cacheAt'];
+    if (json['origin'] != null) {
+      origin = PoetryDetail();
+//      json['origin'].forEach((v) {
+//        origin.add(PoetryDetail.fromJson(v));
+//      });
+    }
+  }
 
   @override
   String toString() => 'Poetry { id: $id }';

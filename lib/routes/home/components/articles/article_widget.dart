@@ -1,6 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:russell_flutter/blocs/blocs.dart';
 import 'package:russell_flutter/models/article_shortend.dart';
 
 class ArticleWidget extends StatelessWidget {
@@ -10,6 +12,7 @@ class ArticleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ArticleDetailBloc _detailBloc = BlocProvider.of<ArticleDetailBloc>(context);
     var ran = Random();
     double colorH = ran.nextInt(360) * 1.0;
     double colorS = 1.0;
@@ -41,6 +44,9 @@ class ArticleWidget extends StatelessWidget {
       isThreeLine: true,
       subtitle: Text(this.article.description),
       dense: true,
+      onTap: () {
+        Navigator.pushNamed(context, '/articleDetail');
+      },
     );
   }
 }

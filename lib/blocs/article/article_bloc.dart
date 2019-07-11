@@ -57,14 +57,6 @@ class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
         yield ArticleError();
       }
     }
-
-    if (event is FetchArticleDetail) {
-      try {
-        if (currentState is ArticleDetailUninitialized) {
-
-        }
-      }
-    }
   }
 
   bool _hasReachedMax(ArticleState state) =>

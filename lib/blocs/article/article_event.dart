@@ -20,9 +20,3 @@ class FetchClassifiedArticle extends ArticleEvent {
   @override
   String toString() => 'FetchClassifiedArticle';
 }
-
-class FetchArticleDetail extends ArticleEvent {
-
-  @override
-  String toString() => 'FetchArticleDetail';
-}

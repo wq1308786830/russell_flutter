@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:russell_flutter/routes/article/article_detail.dart';
 import 'package:russell_flutter/routes/home/home.dart';
 
 import 'blocs/blocs.dart';
@@ -36,6 +37,9 @@ void main() {
       BlocProvider<ArticleBloc>(
         builder: (context) => ArticleBloc(),
       ),
+      BlocProvider<ArticleDetailBloc>(
+        builder: (context) => ArticleDetailBloc(),
+      ),
     ],
   ));
 }
@@ -49,7 +53,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Home(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => Home(),
+        '/articleDetail': (context) => ArticleDetail(),
+      },
     );
   }
 }

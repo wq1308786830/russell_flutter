@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:russell_flutter/blocs/article/article_bloc.dart';
 import 'package:russell_flutter/blocs/blocs.dart';
 import 'package:russell_flutter/components/common/bottom_loader.dart';
-import 'package:russell_flutter/routes/articles/article_widget.dart';
+
+import 'article_widget.dart';
 
 class ArticleList extends StatefulWidget {
   @override
