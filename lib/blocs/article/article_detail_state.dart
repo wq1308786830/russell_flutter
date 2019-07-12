@@ -11,8 +11,11 @@ class ArticleDetailUninitialized extends ArticleDetailState {
 }
 
 class ArticleDetailError extends ArticleDetailState {
+
+  final errorMsg;
+  ArticleDetailError({this.errorMsg});
   @override
-  String toString() => 'ArticleDetailError';
+  String toString() => 'ArticleDetailError: ${this.errorMsg}';
 }
 
 class ArticleDetailLoaded extends ArticleDetailState {

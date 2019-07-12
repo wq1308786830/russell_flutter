@@ -19,14 +19,16 @@ class ArticleDetailBloc extends Bloc<ArticleDetailEvent, ArticleDetailState> {
   Stream<ArticleDetailState> mapEventToState(ArticleDetailEvent event) async* {
     if (event is FetchArticleDetail) {
       try {
+        if (currentState is ArticleDetailLoaded) {
+          yield ArticleDetailUninitialized();
+        }
         if (currentState is ArticleDetailUninitialized) {
           final poetry = await _fetchPoetry();
           yield ArticleDetailLoaded(poetry: poetry);
           return;
         }
-      } catch (_) {
-        yield ArticleDetailError();
-        throw Exception(_);
+      } catch (err) {
+        yield ArticleDetailError(errorMsg: err);
       }
     }
   }
@@ -38,11 +40,15 @@ class ArticleDetailBloc extends Bloc<ArticleDetailEvent, ArticleDetailState> {
 
     final response = await httpClient.get('https://v2.jinrishici.com/sentence', headers: {"X-User-Token": token});
     if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final result = data['data'] as Poetry;
-      return result;
+      return parsePoetry(response.body);
     } else {
       throw Exception('error fetching articles');
     }
+  }
+
+  Poetry parsePoetry(String responseBody) {
+    final parsed = json.decode(responseBody);
+    final parsedData = parsed['data'] as Map<String, dynamic>;
+    return Poetry.fromJson(parsedData);
   }
 }

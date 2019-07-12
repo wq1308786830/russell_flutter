@@ -1,26 +1,38 @@
-import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
 
 class PoetryDetail {
-  final String title;
-  final String dynasty;
-  final String author;
-  final List<String> content;
-  final List<String> translate;
+  String title;
+  String dynasty;
+  String author;
+  List<String> content;
+  List<String> translate;
 
   PoetryDetail(
       {this.title, this.dynasty, this.author, this.content, this.translate});
+
+  /// mapped json poetry detail content cast to PoetryDetail class
+  /// [jsn] mapped json
+  PoetryDetail.fromJson(Map<String, dynamic> jsn) {
+    title = jsn['title'];
+    dynasty = jsn['dynasty'];
+    author = jsn['author'];
+
+    final contentList = jsn['content'] as List<dynamic>;
+    final translateList = jsn['translate'] as List<dynamic>;
+    content = contentList.map((rawContent) => rawContent as String).toList();
+    translate =
+        translateList.map((rawTranslate) => rawTranslate as String).toList();
+  }
 }
 
-@immutable
 class Poetry extends Equatable {
+  int popularity;
   String id;
   String content;
-  int popularity;
+  String cacheAt;
+  String recommendedReason;
   PoetryDetail origin;
   List<String> matchTags;
-  String recommendedReason;
-  String cacheAt;
 
   Poetry(
       {this.id,
@@ -29,29 +41,25 @@ class Poetry extends Equatable {
       this.origin,
       this.matchTags,
       this.recommendedReason,
-      this.cacheAt})
-      : super([
-          id,
-          content,
-          popularity,
-          origin,
-          matchTags,
-          recommendedReason,
-          cacheAt
-        ]);
+      this.cacheAt});
 
-  Poetry.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    content = json['content'];
-    popularity = json['popularity'];
-    matchTags = json['matchTags'];
-    recommendedReason = json['recommendedReason'];
-    cacheAt = json['cacheAt'];
-    if (json['origin'] != null) {
-      origin = PoetryDetail();
-//      json['origin'].forEach((v) {
-//        origin.add(PoetryDetail.fromJson(v));
-//      });
+  /// mapped json poetry content cast to Poetry class
+  /// [jsn] mapped json
+  Poetry.fromJson(Map<String, dynamic> jsn) {
+    id = jsn['id'];
+    content = jsn['content'];
+    popularity = jsn['popularity'];
+    recommendedReason = jsn['recommendedReason'];
+    cacheAt = jsn['cacheAt'];
+
+    final matchTagsList = jsn['matchTags'] as List<dynamic>;
+    if (jsn['matchTags'] != null) {
+      matchTags =
+          matchTagsList.map((rawMatchTag) => rawMatchTag as String).toList();
+    }
+
+    if (jsn['origin'] != null) {
+      origin = PoetryDetail.fromJson(jsn['origin']);
     }
   }
 
